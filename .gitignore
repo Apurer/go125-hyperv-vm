@@ -1,0 +1,23 @@
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Build artifacts (keep VM images)
+build/
+dist/
+*.log
+
+# Don't ignore VM files - they're tracked by LFS
+!*.vhdx
+!*.vhdx.gz
+!*.vmdk
+!*.vmdk.gz
