@@ -1,0 +1,96 @@
+name: Manual VM Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      vm_type:
+        description: 'VM type to build'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+        - 'fixed'
+        - 'dynamic' 
+        - 'both'
+      create_release:
+        description: 'Create GitHub release'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  manual-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+        
+    - name: Setup environment
+      run: |
+        echo "🚀 Manual VM build triggered"
+        echo "VM type: ${{ github.event.inputs.vm_type }}"
+        echo "Create release: ${{ github.event.inputs.create_release }}"
+        
+    - name: Download LFS files
+      run: |
+        git lfs install
+        git lfs pull
+        
+    - name: Process VM images
+      run: |
+        echo "📦 Processing VM images..."
+        
+        if [[ "${{ github.event.inputs.vm_type }}" == "fixed" ]] || [[ "${{ github.event.inputs.vm_type }}" == "both" ]]; then
+          if [[ -f "fedora-coreos-go125-hyperv-fixed.vhdx.gz" ]]; then
+            echo "✅ Fixed VHDX found: $(ls -lh fedora-coreos-go125-hyperv-fixed.vhdx.gz)"
+          else
+            echo "❌ Fixed VHDX not found"
+          fi
+        fi
+        
+        if [[ "${{ github.event.inputs.vm_type }}" == "dynamic" ]] || [[ "${{ github.event.inputs.vm_type }}" == "both" ]]; then
+          if [[ -f "fedora-coreos-go125-hyperv-dynamic.vhdx.gz" ]]; then
+            echo "✅ Dynamic VHDX found: $(ls -lh fedora-coreos-go125-hyperv-dynamic.vhdx.gz)"
+          else
+            echo "❌ Dynamic VHDX not found"  
+          fi
+        fi
+        
+        # Create checksums
+        sha256sum *.vhdx.gz > checksums.txt
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: manual-vm-build-${{ github.run_number }}
+        path: |
+          *.vhdx.gz
+          *.md
+          *.sh
+          checksums.txt
+          
+    - name: Create release (if requested)
+      if: github.event.inputs.create_release == 'true'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: manual-v${{ github.run_number }}
+        name: Manual VM Build ${{ github.run_number }}
+        files: |
+          *.vhdx.gz
+          *.md
+          *.sh
+          checksums.txt
+        body: |
+          # Manual VM Build - Go 1.25.1 Development Environment
+          
+          Built from commit: ${{ github.sha }}
+          VM type: ${{ github.event.inputs.vm_type }}
+          
+          Complete development environment with Go 1.25.1 + all tools ready for Windows 11 Hyper-V.
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
