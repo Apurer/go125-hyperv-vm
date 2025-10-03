@@ -21,3 +21,5 @@ dist/
 !*.vhdx.gz
 !*.vmdk
 !*.vmdk.gz
+*.qcow2
+*.vhdx
