@@ -47,16 +47,14 @@
         "path": "/etc/ssh/sshd_config.d/99-podman-machine.conf",
         "mode": 420,
         "contents": {
-          "source": "data:;base64,UHVia2V5QXV0aGVudGljYXRpb24geWVzClBhc3N3b3JkQXV0aGVudGljYXRpb24geWVzClBlcm1pdEVtcHR5UGFzc3dvcmRzIHllcwo=",
-          "verification": {}
+          "source": "data:;base64,UHVia2V5QXV0aGVudGljYXRpb24geWVzClBhc3N3b3JkQXV0aGVudGljYXRpb24geWVzClBlcm1pdEVtcHR5UGFzc3dvcmRzIHllcwo="
         }
       },
       {
         "path": "/etc/motd",
         "mode": 420,
         "contents": {
-          "source": "data:;base64,8J+agCBDb3JlT1MgUmVhZHkKCuKchSBBdXRvLWxvZ2luIGVuYWJsZWQK4pyFIFNTSCBjb25maWd1cmVkCuKchSBObyBhdXRoIHByb21wdHMK",
-          "verification": {}
+          "source": "data:;base64,8J+agCBDb3JlT1MgUmVhZHkKCuKchSBBdXRvLWxvZ2luIGVuYWJsZWQK4pyFIFNTSCBjb25maWd1cmVkCuKchSBObyBhdXRoIHByb21wdHMK"
         }
       }
     ]
