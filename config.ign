@@ -1,0 +1,78 @@
+{
+  "ignition": {
+    "version": "3.4.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "groups": [
+          "wheel",
+          "sudo"
+        ],
+        "name": "core",
+        "passwordHash": "$6$rounds=4096$saltsalt$3xzPjbez6pF7d2JQ9lPLw8wE1q2eJyKUNzOAl./ckVh2Nf6vZ8bm1XbYxU1CcCj8kGxO4dz8sX3n6mF1VmH7T1",
+        "sshAuthorizedKeys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqP7BGw/EShM+C8vN5WwvyKUaKrylmkp3k5Q4fJc4vL coreos-vm-access"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "directories": [
+      {
+        "group": {
+          "name": "core"
+        },
+        "path": "/home/core/workspace",
+        "user": {
+          "name": "core"
+        },
+        "mode": 493
+      }
+    ],
+    "files": [
+      {
+        "path": "/etc/ssh/sshd_config.d/20-enable-passwords.conf",
+        "contents": {
+          "compression": "",
+          "source": "data:,PasswordAuthentication%20yes%0APermitRootLogin%20no%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/profile.d/go125.sh",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/0qtKMgvKlEIcAzxsNUvLS7Sz8lPTszRT8/XT8rMs1IBiVupePj7ukKFuKAa3P2D/P1DULUg5MDGwbRxAQIAAP//3rzfEWQAAAA="
+        },
+        "mode": 493
+      },
+      {
+        "group": {
+          "name": "core"
+        },
+        "path": "/home/core/.bashrc",
+        "user": {
+          "name": "core"
+        },
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/0zMMU7DQBAF0N6n+JhiK6/lSGmQXFFQguAEw3riXTHyoJl1IrqcgwaJo3ECjhBFSuHuS/+/f4/4Tp4tNa6rJUbPNfWfpociHKd+1mG3j54bkkIOkTGIoxNC1yUVtZHWquFWz8cxzIojmxddQsMpK9r/n+8zHtX4+Q2nUjOeFEPc7eMAY5q+7trb8O/8i9d1wfYDVZEyp4+rKotXEqFadNmiF3I/qU04qCGpMVZne0C4ZvXQNpcAAAD//11xeLzoAAAA"
+        },
+        "mode": 420
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "enabled": true,
+        "name": "serial-getty@ttyS0.service"
+      },
+      {
+        "enabled": true,
+        "name": "sshd.service"
+      }
+    ]
+  }
+}
