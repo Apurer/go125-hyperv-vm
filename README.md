@@ -4,100 +4,102 @@ Complete virtual machine images with Go 1.25.1 and full development environment.
 
 ## 🚀 Quick Start
 
-### Option 1: Podman Machine (Recommended)
+### Option 1: Podman Machine (macOS/Linux)
 ```bash
 # Download qcow2 image
-curl -L -o go125.qcow2.gz https://github.com/Apurer/go125-vm-images/releases/download/v1.1.0/fedora-coreos-go125.qcow2.gz
-gunzip go125.qcow2.gz
+git clone https://github.com/Apurer/go125-hyperv-vm.git
+cd go125-hyperv-vm  
+gunzip fedora-coreos-go125.qcow2.gz
 
 # Create and start VM
-podman machine init --image ./go125.qcow2 go125-dev
+podman machine init --image ./fedora-coreos-go125.qcow2 go125-dev
 podman machine start go125-dev
 podman machine ssh go125-dev
 
-# Inside VM
-source /etc/profile.d/go125.sh
-go version  # Shows: go version go1.25.1 linux/amd64
+# Go 1.25.1 should be available
+source /etc/profile.d/go125.sh 2>/dev/null || echo "Install Go manually"
+go version
 ```
 
-### Option 2: Windows 11 Hyper-V
+### Option 2: Windows 11 Hyper-V (AMD64)
 ```bash
-# Download VHDX image
-curl -L -o go125-hyperv.vhdx.gz https://github.com/Apurer/go125-vm-images/releases/download/v1.1.0/fedora-coreos-go125-hyperv-fixed.vhdx.gz
-gunzip go125-hyperv.vhdx.gz
-
-# Import into Hyper-V
-1. Create new VM (Generation 2)
-2. Use existing VHDX: go125-hyperv.vhdx
-3. Disable Secure Boot
-4. Set network to Default Switch
-5. Start VM
+# Download AMD64 VHDX image  
+git clone https://github.com/Apurer/go125-hyperv-vm.git
+cd go125-hyperv-vm
+gunzip fedora-coreos-go125-hyperv-amd64.vhdx.gz
 ```
+
+#### Windows 11 Hyper-V Setup:
+1. **Create VM in Hyper-V Manager:**
+   - Generation 2 VM
+   - Use existing VHDX: `fedora-coreos-go125-hyperv-amd64.vhdx`
+   - **Disable Secure Boot** in VM firmware settings
+   - Set network adapter to **Default Switch**
+
+2. **First Boot Setup:**
+   ```bash
+   # Boot VM and login via Hyper-V console as 'core' (no password)
+   
+   # Set password for core user
+   sudo passwd core
+   
+   # Install Go 1.25.1
+   curl -fsSL https://go.dev/dl/go1.25.1.linux-amd64.tar.gz | sudo tar -C /usr/local -xz
+   echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.bashrc
+   source ~/.bashrc
+   
+   # Verify Go installation
+   go version
+   
+   # Enable SSH (optional)
+   sudo sed -i 's/#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+   sudo systemctl restart sshd
+   ip addr show eth0  # Get IP for SSH access
+   ```
 
 ## 📦 What's Included
 
-### Go Development Environment
-- **Go 1.25.1** installed at `/usr/local/go`
-- **GOPATH** configured at `$HOME/go`
-- **PATH** includes Go binaries
-
-### Development Tools
-- **Build tools**: make, gcc, gcc-c++
-- **Version control**: git
-- **Editors**: vim
-- **System tools**: htop, tmux, tree
-- **Network tools**: curl, wget
-
 ### System Configuration
-- **OS**: Fedora CoreOS (stable)
-- **User**: `core` with sudo access
-- **SSH**: Configured automatically by podman machine
+- **OS**: Fedora CoreOS (stable) AMD64
+- **User**: `core` with sudo access  
 - **Workspace**: `~/workspace` directory ready
+- **Architecture**: AMD64/x86_64 (compatible with Windows Intel/AMD)
 
-## 📁 Available Formats
+### Development Environment  
+- **Go 1.25.1**: Ready to install (see setup commands above)
+- **Build tools**: Available via `dnf install` (make, gcc, etc.)
+- **System tools**: Standard CoreOS utilities
 
-| Format | Use Case | File |
-|--------|----------|------|
-| **QCOW2** | KVM, QEMU, **podman machine** | `fedora-coreos-go125.qcow2.gz` |
-| **VHDX** | **Windows 11 Hyper-V** | `fedora-coreos-go125-hyperv-fixed.vhdx.gz` |
-| **VMDK** | VMware | `fedora-coreos-go125.vmdk.gz` |
-| **VDI** | VirtualBox | `fedora-coreos-go125.vdi.gz` |
+## 📁 Available Files
 
-## 🔧 Usage Examples
+| File | Purpose | Use Case |
+|------|---------|----------|
+| `fedora-coreos-go125.qcow2.gz` | QCOW2 format | **podman machine**, KVM, QEMU |
+| `fedora-coreos-go125-hyperv-amd64.vhdx.gz` | **AMD64 VHDX** | **Windows 11 Hyper-V** |
+| `fedora-coreos-go125-hyperv-fixed.vhdx.gz` | Legacy VHDX | Older Hyper-V versions |
+| `fedora-coreos-go125-hyperv-dynamic.vhdx.gz` | Dynamic VHDX | Alternative Hyper-V format |
 
-### Test Go Installation
-```bash
-podman machine ssh go125-dev
-source /etc/profile.d/go125.sh
-go version
-go env
-```
+## 🔧 Development Workflow
 
 ### Create Go Project
 ```bash
+# In the VM
 cd ~/workspace
-mkdir hello-world
-cd hello-world
+mkdir hello-world && cd hello-world
 go mod init hello-world
+
 echo 'package main
-
 import "fmt"
+func main() { fmt.Println("Hello from Go 1.25.1!") }' > main.go
 
-func main() {
-    fmt.Println("Hello from Go 1.25.1!")
-}' > main.go
 go run main.go
-```
-
-### Build and Run
-```bash
 go build
 ./hello-world
 ```
 
 ## 🛠️ VM Specifications
 
-- **CPU**: Multi-core support
+- **CPU**: Multi-core support  
 - **Memory**: 2GB+ recommended
 - **Disk**: 10GB allocated, ~2GB used
 - **Network**: DHCP configured
@@ -105,46 +107,32 @@ go build
 
 ## 📋 Troubleshooting
 
+### Windows Hyper-V Issues
+- **Secure Boot**: Must be **disabled** for CoreOS
+- **Network**: Use **Default Switch** for internet access
+- **Generation**: Must be **Generation 2** VM
+- **Login**: First login as `core` with no password, then set password
+
+### Go Installation Issues
+```bash
+# Manual Go installation if needed
+curl -fsSL https://go.dev/dl/go1.25.1.linux-amd64.tar.gz | sudo tar -C /usr/local -xz
+echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ### Podman Machine Issues
 ```bash
 # Check machine status
 podman machine list
-
-# Restart machine
-podman machine stop go125-dev
-podman machine start go125-dev
-
-# SSH connection
-podman machine ssh go125-dev
+podman machine start machine-name
+podman machine ssh machine-name
 ```
-
-### Hyper-V Issues
-- Ensure **Hyper-V** is enabled in Windows features
-- Use **Generation 2** VMs
-- **Disable Secure Boot** in VM firmware settings
-- Configure **network adapter** (Default Switch recommended)
-
-## 🔄 Updates
-
-This repository contains VM images with Go 1.25.1. For newer versions:
-1. Check [releases](https://github.com/Apurer/go125-vm-images/releases)
-2. Download updated images
-3. Create new podman machine or import new VHDX
 
 ## 📝 License
 
 These VM images are based on Fedora CoreOS and include Go from the official Go project.
-See individual project licenses for details.
-
-## 🤝 Contributing
-
-Issues and pull requests welcome! 
-
-To rebuild images:
-1. Clone repository
-2. Run `./build-and-push.sh`
-3. Create pull request
 
 ---
 
-**Built with ❤️ for Go development**
+**Built for Go 1.25.1 development on Windows 11 Hyper-V and podman machine** 🚀
