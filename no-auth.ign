@@ -1,0 +1,50 @@
+{
+  "ignition": {"version": "3.4.0"},
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "groups": ["wheel", "sudo"],
+        "shell": "/bin/bash"
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "name": "serial-getty@ttyS0.service",
+        "enabled": true,
+        "dropins": [
+          {
+            "name": "autologin.conf",
+            "contents": "[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin core --noclear %I $TERM"
+          }
+        ]
+      },
+      {
+        "name": "getty@tty1.service",
+        "enabled": true,
+        "dropins": [
+          {
+            "name": "autologin.conf", 
+            "contents": "[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin core --noclear %I $TERM"
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/etc/ssh/sshd_config.d/99-disable-auth.conf",
+        "mode": 420,
+        "contents": {"source": "data:,PermitEmptyPasswords%20yes%0APasswordAuthentication%20no%0APubkeyAuthentication%20yes%0A"}
+      },
+      {
+        "path": "/etc/motd",
+        "mode": 420,
+        "contents": {"source": "data:,%F0%9F%9A%80%20CoreOS%20-%20No%20Auth%20Mode%0A%0A%E2%9C%85%20Auto-login%20enabled%20for%20core%20user%0A%E2%9C%85%20SSH%20configured%20by%20podman%20machine%0A%E2%9C%85%20Ready%20for%20podman%20machine%20init%20--image%0A%0A%F0%9F%94%A7%20No%20authentication%20prompts!"}
+      }
+    ]
+  }
+}
