@@ -1,0 +1,63 @@
+{
+  "ignition": {
+    "version": "3.4.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "groups": ["wheel", "sudo"],
+        "shell": "/bin/bash",
+        "sshAuthorizedKeys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHsQkc+xsrtPYTkPrDTRBFzIBwMkN+Zdpwa5b7K51+Y+ podman-machine-access"
+        ]
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "name": "serial-getty@ttyS0.service",
+        "enabled": true,
+        "dropins": [
+          {
+            "name": "autologin.conf",
+            "contents": "[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin core --noclear %I $TERM"
+          }
+        ]
+      },
+      {
+        "name": "getty@tty1.service",
+        "enabled": true,
+        "dropins": [
+          {
+            "name": "autologin.conf",
+            "contents": "[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin core --noclear %I $TERM"
+          }
+        ]
+      },
+      {
+        "name": "sshd.service",
+        "enabled": true
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/etc/ssh/sshd_config.d/99-podman-machine.conf",
+        "mode": 420,
+        "contents": {
+          "source": "data:,PubkeyAuthentication%20yes%0APasswordAuthentication%20yes%0APermitEmptyPasswords%20yes%0A"
+        }
+      },
+      {
+        "path": "/etc/motd",
+        "mode": 420,
+        "contents": {
+          "source": "data:,%F0%9F%9A%80%20CoreOS%20Ready%0A%0A%E2%9C%85%20Auto-login%20enabled%0A%E2%9C%85%20SSH%20configured%0A%E2%9C%85%20No%20auth%20prompts%0A"
+        }
+      }
+    ]
+  }
+}

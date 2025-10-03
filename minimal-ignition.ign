@@ -1,0 +1,29 @@
+{
+  "ignition": {
+    "version": "3.4.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "sshAuthorizedKeys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHsQkc+xsrtPYTkPrDTRBFzIBwMkN+Zdpwa5b7K51+Y+ podman-machine-access"
+        ]
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "name": "serial-getty@ttyS0.service",
+        "enabled": true,
+        "dropins": [
+          {
+            "name": "autologin.conf",
+            "contents": "[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin core --noclear %I $TERM\n"
+          }
+        ]
+      }
+    ]
+  }
+}
