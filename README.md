@@ -1,182 +1,150 @@
-# Go 1.25.1 Development VM for Windows 11 Hyper-V
+# Go 1.25.1 VM Images
 
-[![Download VM](https://img.shields.io/badge/Download-VM%20Images-blue)](https://github.com/YOUR_USERNAME/YOUR_REPO/releases)
-[![Go Version](https://img.shields.io/badge/Go-1.25.1-00ADD8)](https://golang.org/)
-[![OS](https://img.shields.io/badge/OS-Fedora%20CoreOS-294172)](https://getfedora.org/coreos/)
+Complete virtual machine images with Go 1.25.1 and full development environment.
 
-## 🚀 Complete Development Environment
+## 🚀 Quick Start
 
-Ready-to-use virtual machine with **Go 1.25.1** and **all development tools** for Windows 11 Hyper-V.
-
-### 📦 VM Image Files (GitHub LFS)
-
-| File | Size | Description |
-|------|------|-------------|
-| `fedora-coreos-go125-hyperv-fixed.vhdx.gz` | ~1.1GB | **Recommended** - Better performance |
-| `fedora-coreos-go125-hyperv-dynamic.vhdx.gz` | ~1.1GB | Space efficient |
-
-### ✅ What's Included
-
-#### Go Development
-- **Go 1.25.1** (latest AMD64)
-- Pre-configured environment (GOROOT, GOPATH, PATH)
-- Sample code and comprehensive Makefile
-
-#### Development Tools
-- **Make 4.4.1** - Build automation
-- **GCC 15.2.1** - C/C++ compiler suite  
-- **Git 2.51.0** - Version control
-- **Python 3.13.7** + pip
-- **Node.js 22.19.0** + npm
-
-#### Editors & Utilities
-- **vim, nano** - Text editors
-- **tmux, screen** - Terminal multiplexers
-- **htop** - System monitoring
-- **tree** - Directory visualization  
-- **curl, wget** - Network utilities
-- **rsync** - File synchronization
-- **tar, gzip** - Archive tools
-- **bash-completion** - Shell enhancements
-
-## 🖥️ Installation Guide
-
-### Prerequisites
-- Windows 11 with Hyper-V enabled
-- 4GB+ RAM available for VM
-- ~15GB free disk space
-
-### Download Options
-
-#### Option 1: Git LFS (Current Repository)
+### Option 1: Podman Machine (Recommended)
 ```bash
-# Clone with LFS support
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
+# Download qcow2 image
+curl -L -o go125.qcow2.gz https://github.com/Apurer/go125-vm-images/releases/download/v1.1.0/fedora-coreos-go125.qcow2.gz
+gunzip go125.qcow2.gz
 
-# LFS files are downloaded automatically
-ls -la *.vhdx.gz
+# Create and start VM
+podman machine init --image ./go125.qcow2 go125-dev
+podman machine start go125-dev
+podman machine ssh go125-dev
+
+# Inside VM
+source /etc/profile.d/go125.sh
+go version  # Shows: go version go1.25.1 linux/amd64
 ```
 
-#### Option 2: Direct Download
-Download individual files:
-- [Fixed VHDX (Recommended)](./fedora-coreos-go125-hyperv-fixed.vhdx.gz)
-- [Dynamic VHDX](./fedora-coreos-go125-hyperv-dynamic.vhdx.gz)
-- [Setup Script](./setup-complete-dev-environment.sh)
+### Option 2: Windows 11 Hyper-V
+```bash
+# Download VHDX image
+curl -L -o go125-hyperv.vhdx.gz https://github.com/Apurer/go125-vm-images/releases/download/v1.1.0/fedora-coreos-go125-hyperv-fixed.vhdx.gz
+gunzip go125-hyperv.vhdx.gz
 
-### Hyper-V Setup
+# Import into Hyper-V
+1. Create new VM (Generation 2)
+2. Use existing VHDX: go125-hyperv.vhdx
+3. Disable Secure Boot
+4. Set network to Default Switch
+5. Start VM
+```
 
-1. **Decompress VM image**:
-   ```bash
-   gunzip fedora-coreos-go125-hyperv-fixed.vhdx.gz
-   ```
+## 📦 What's Included
 
-2. **Create Hyper-V VM**:
-   - Open **Hyper-V Manager** as Administrator
-   - **New Virtual Machine**
-   - **Generation 2** (UEFI) - **Required!**
-   - Memory: 4-8GB recommended
-   - **Use existing virtual hard disk** → Browse to `.vhdx` file
-   - **Settings → Security → Disable Secure Boot**
+### Go Development Environment
+- **Go 1.25.1** installed at `/usr/local/go`
+- **GOPATH** configured at `$HOME/go`
+- **PATH** includes Go binaries
 
-3. **First Boot**:
-   ```bash
-   # Login as 'core' user (no password)
-   ./setup-complete-dev-environment.sh
-   
-   # Reboot to activate all tools
-   sudo systemctl reboot
-   ```
+### Development Tools
+- **Build tools**: make, gcc, gcc-c++
+- **Version control**: git
+- **Editors**: vim
+- **System tools**: htop, tmux, tree
+- **Network tools**: curl, wget
 
-## 🔧 Usage
+### System Configuration
+- **OS**: Fedora CoreOS (stable)
+- **User**: `core` with sudo access
+- **SSH**: Configured automatically by podman machine
+- **Workspace**: `~/workspace` directory ready
 
-### Immediate (Go ready)
+## 📁 Available Formats
+
+| Format | Use Case | File |
+|--------|----------|------|
+| **QCOW2** | KVM, QEMU, **podman machine** | `fedora-coreos-go125.qcow2.gz` |
+| **VHDX** | **Windows 11 Hyper-V** | `fedora-coreos-go125-hyperv-fixed.vhdx.gz` |
+| **VMDK** | VMware | `fedora-coreos-go125.vmdk.gz` |
+| **VDI** | VirtualBox | `fedora-coreos-go125.vdi.gz` |
+
+## 🔧 Usage Examples
+
+### Test Go Installation
+```bash
+podman machine ssh go125-dev
+source /etc/profile.d/go125.sh
+go version
+go env
+```
+
+### Create Go Project
 ```bash
 cd ~/workspace
-go version                    # Go 1.25.1
-go run hello-complete.go      # Test program
-```
+mkdir hello-world
+cd hello-world
+go mod init hello-world
+echo 'package main
 
-### After Reboot (All tools)  
-```bash
-make tools-check             # Verify all tools
-gcc --version               # C/C++ development
-git --version               # Version control
-python3 --version           # Python development
-node --version              # JavaScript development
-```
-
-### Development Workflow
-```bash
-# Create new Go project
-mkdir ~/workspace/myapp && cd ~/workspace/myapp
-go mod init myapp
-
-# Create main.go
-cat > main.go << 'MAIN'
-package main
 import "fmt"
+
 func main() {
-    fmt.Println("Hello from Hyper-V Go development!")
-}
-MAIN
-
-# Build and run
+    fmt.Println("Hello from Go 1.25.1!")
+}' > main.go
 go run main.go
-go build -o myapp
 ```
 
-## 🛠️ Useful Aliases
-
-Pre-configured shortcuts:
-- `gv` → `go version`
-- `gb` → `go build`  
-- `gr` → `go run`
-- `gt` → `go test`
-- `mk` → `make`
-- `v` → `vim`
-- `h` → `htop`
-- `t` → `tmux`
-- `ll` → `ls -la --color=auto`
-
-## 🌐 Networking
-
-Enable SSH for easier development:
+### Build and Run
 ```bash
-sudo passwd core        # Set password
-ip addr show           # Get VM IP
-# From Windows: ssh core@<vm-ip>
+go build
+./hello-world
 ```
 
-## 📋 Technical Details
+## 🛠️ VM Specifications
 
-- **OS**: Fedora CoreOS (Immutable Linux)
-- **Architecture**: AMD64/x86_64  
-- **Format**: VHDX (Hyper-V Generation 2)
-- **User**: core (passwordless sudo)
-- **Persistence**: User data in `/home` and `/var`
+- **CPU**: Multi-core support
+- **Memory**: 2GB+ recommended
+- **Disk**: 10GB allocated, ~2GB used
+- **Network**: DHCP configured
+- **Architecture**: AMD64/x86_64
 
-## 🆘 Troubleshooting
+## 📋 Troubleshooting
 
-### VM Won't Boot
-- Ensure **Generation 2** VM
-- **Disable Secure Boot** in VM settings
-- Check UEFI boot order
+### Podman Machine Issues
+```bash
+# Check machine status
+podman machine list
 
-### Tools Not Available
-- Run setup script: `./setup-complete-dev-environment.sh`
-- Reboot after setup: `sudo systemctl reboot`
-- Tools are layered with rpm-ostree
+# Restart machine
+podman machine stop go125-dev
+podman machine start go125-dev
 
-### Performance Issues  
-- Use **fixed VHDX** (not dynamic)
-- Allocate more RAM (8GB recommended)
-- Enable Hyper-V Integration Services
+# SSH connection
+podman machine ssh go125-dev
+```
+
+### Hyper-V Issues
+- Ensure **Hyper-V** is enabled in Windows features
+- Use **Generation 2** VMs
+- **Disable Secure Boot** in VM firmware settings
+- Configure **network adapter** (Default Switch recommended)
+
+## 🔄 Updates
+
+This repository contains VM images with Go 1.25.1. For newer versions:
+1. Check [releases](https://github.com/Apurer/go125-vm-images/releases)
+2. Download updated images
+3. Create new podman machine or import new VHDX
+
+## 📝 License
+
+These VM images are based on Fedora CoreOS and include Go from the official Go project.
+See individual project licenses for details.
 
 ## 🤝 Contributing
 
-Issues and improvements welcome! This VM provides a complete Go 1.25.1 development environment for Windows 11.
+Issues and pull requests welcome! 
+
+To rebuild images:
+1. Clone repository
+2. Run `./build-and-push.sh`
+3. Create pull request
 
 ---
 
-**Ready for Go 1.25.1 development on Windows 11 Hyper-V!** 🚀
+**Built with ❤️ for Go development**

@@ -1,0 +1,7 @@
+FROM scratch
+COPY fedora-coreos-go125.qcow2 /disk.qcow2
+LABEL description="Fedora CoreOS with Go 1.25.1 - VM Disk Image"
+LABEL architecture="x86_64"
+LABEL format="qcow2"
+LABEL os="fedora-coreos"
+LABEL go-version="1.25.1"

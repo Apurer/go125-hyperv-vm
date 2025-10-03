@@ -1,0 +1,17 @@
+FROM ghcr.io/apurer/complete-coreos-dev:go125-amd64-runtime
+
+# Critical labels for podman machine compatibility
+LABEL containers.bootc="1"
+LABEL ostree.bootable="true"
+LABEL com.coreos.osname="fedora-coreos"
+LABEL fedora-coreos.stream="stable"
+LABEL ostree.commit="manual-go125-build"
+
+# Set proper init command for bootable container
+CMD ["/sbin/init"]
+
+# Set standard environment
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Note: Skip systemctl commands as they require running systemd
+# The bootable container will handle service enabling during boot
