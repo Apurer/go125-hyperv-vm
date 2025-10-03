@@ -21,40 +21,40 @@ source /etc/profile.d/go125.sh 2>/dev/null || echo "Install Go manually"
 go version
 ```
 
-### Option 2: Windows 11 Hyper-V (AMD64)
+### Option 2: Windows 11 Hyper-V (AMD64) - **RECOMMENDED**
 ```bash
-# Download AMD64 VHDX image  
+# Download ready-to-use VHDX (NO authentication issues!)
 git clone https://github.com/Apurer/go125-hyperv-vm.git
 cd go125-hyperv-vm
-gunzip fedora-coreos-go125-hyperv-amd64.vhdx.gz
+gunzip fedora-coreos-go125-hyperv-ready.vhdx.gz
 ```
 
-#### Windows 11 Hyper-V Setup:
+#### ✅ **Simple Windows 11 Hyper-V Setup:**
 1. **Create VM in Hyper-V Manager:**
    - Generation 2 VM
-   - Use existing VHDX: `fedora-coreos-go125-hyperv-amd64.vhdx`
-   - **Disable Secure Boot** in VM firmware settings
+   - Use existing VHDX: `fedora-coreos-go125-hyperv-ready.vhdx`
+   - **⚠️ DISABLE Secure Boot** in VM firmware settings
    - Set network adapter to **Default Switch**
+   - Memory: 4GB recommended
 
-2. **First Boot Setup:**
+2. **Boot and Login (NO PROMPTS!):**
+   - ✅ Boot VM - **no authentication prompts during startup**
+   - ✅ Login as `core` (no password required initially)
+   - ✅ Ready to use immediately!
+
+3. **Optional Setup:**
    ```bash
-   # Boot VM and login via Hyper-V console as 'core' (no password)
-   
-   # Set password for core user
+   # Set password (optional)
    sudo passwd core
    
    # Install Go 1.25.1
    curl -fsSL https://go.dev/dl/go1.25.1.linux-amd64.tar.gz | sudo tar -C /usr/local -xz
    echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.bashrc
-   source ~/.bashrc
-   
-   # Verify Go installation
-   go version
+   source ~/.bashrc && go version
    
    # Enable SSH (optional)
-   sudo sed -i 's/#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-   sudo systemctl restart sshd
-   ip addr show eth0  # Get IP for SSH access
+   sudo systemctl enable sshd
+   ip addr show eth0
    ```
 
 ## 📦 What's Included
@@ -75,7 +75,8 @@ gunzip fedora-coreos-go125-hyperv-amd64.vhdx.gz
 | File | Purpose | Use Case |
 |------|---------|----------|
 | `fedora-coreos-go125.qcow2.gz` | QCOW2 format | **podman machine**, KVM, QEMU |
-| `fedora-coreos-go125-hyperv-amd64.vhdx.gz` | **AMD64 VHDX** | **Windows 11 Hyper-V** |
+| **`fedora-coreos-go125-hyperv-ready.vhdx.gz`** | **✅ Ready VHDX** | **🎯 Windows 11 Hyper-V (RECOMMENDED)** |
+| `fedora-coreos-go125-hyperv-amd64.vhdx.gz` | AMD64 VHDX | Windows 11 Hyper-V (basic) |
 | `fedora-coreos-go125-hyperv-fixed.vhdx.gz` | Legacy VHDX | Older Hyper-V versions |
 | `fedora-coreos-go125-hyperv-dynamic.vhdx.gz` | Dynamic VHDX | Alternative Hyper-V format |
 
